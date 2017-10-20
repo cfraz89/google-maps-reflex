@@ -1,0 +1,39 @@
+resolver: lts-8.11
+
+packages:
+  - '.'
+  - location:
+      git: https://github.com/ghcjs/ghcjs-dom.git
+      commit: 9f5836ecdde832e575c9fdcb501598f6d3e3d7e1
+    subdirs:
+      - ghcjs-dom
+      - ghcjs-dom-jsaddle
+
+  - location:
+      git: https://github.com/ghcjs/jsaddle-dom.git
+      commit: a565feac5df24d26e6fec5463bcb70e3e2fd683b
+
+  - location:
+      git: https://github.com/reflex-frp/reflex.git
+      commit: 1d3a26b3f7d7d50cfe95bb3a28eca38981ad9ec3
+
+  - location:
+      git: https://github.com/reflex-frp/reflex-dom.git
+      commit: 275939f650b87d2d46b6b8416655d963fee9280e
+    subdirs:
+      - reflex-dom-core
+      - reflex-dom
+
+  - location:
+      git: https://github.com/ghcjs/jsaddle.git
+      commit: b0de8bf2dcc4b9171bcddb64a847768aec5eee39
+    subdirs:
+      - jsaddle
+      - jsaddle-warp
+
+extra-deps:
+  - dependent-sum-template-0.0.0.6
+  - prim-uniq-0.1.0.1
+  - ref-tf-0.4.0.1
+  - zenc-0.1.1
+  - jsaddle-wkwebview-0.9.4.0
