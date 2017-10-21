@@ -18,6 +18,6 @@ mapsWidget mapsKey mapOptions = do
         ] blank
     pb <- getPostBuild >>= delay 0.01
     maps <- loadMaps mapsKey pb
-    let mapScript = maps $> createMap (_element_raw mapEl) def
+    let mapScript = (maps $> (createMap (_element_raw mapEl) def $> ()))
     widgetHold blank mapScript 
     return ()

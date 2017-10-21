@@ -1,3 +1,4 @@
+
 module GoogleMapsReflex.GoogleMaps where
 
 import Language.Javascript.JSaddle.Object
@@ -23,14 +24,15 @@ loadMaps :: (MonadWidget t m) => String -> Event t () -> m (Event t ())
 loadMaps mapsKey event = performEventAsync (event $> insertMapsHandler mapsKey)
 
 --Insert mapsLoaded global function which will fire event trigger when maps script loaded, or immediately when alerady exists
-insertMapsHandler :: (MonadJSM m) => String -> (() -> IO()) -> m ()
+insertMapsHandler :: MonadJSM m => String -> (() -> IO()) -> m ()
 insertMapsHandler mapsKey eventTrigger = liftJSM $ do
     --Check if we've done this before
     mapsLoaded <- getProp (toJSString "mapsLoaded") global
     mapsLoadedUndefined <- valIsUndefined mapsLoaded
     if mapsLoadedUndefined
         then do
-            global <# "mapsLoaded" $ loadHandler eventTrigger
+            lh <- loadHandler eventTrigger
+            global <# "mapsLoaded" $ lh
             insertMapsScript mapsKey
         else liftIO $ eventTrigger ()
 
@@ -47,16 +49,15 @@ insertMapsScript mapsKey = liftJSM $ do
     return ()
 
 --The actual mapsloaded function - just fire the event
-loadHandler :: (() -> IO ()) -> JSM Function
-loadHandler eventTrigger = asyncFunction $ \ _ _ _ -> liftIO $ eventTrigger ()
+loadHandler :: MonadJSM m => (() -> IO ()) -> m Function
+loadHandler eventTrigger = liftJSM $ asyncFunction fireEvent
+    where fireEvent _ _ _ = liftIO $ eventTrigger ()
 
 -- Maps Functions
-
-createMap :: (MonadJSM m, ToJSVal e) => e -> MapOptions -> m ()
+createMap :: (MonadJSM m, ToJSVal e) => e -> MapOptions -> m JSVal
 createMap mapEl mapOptions = liftJSM $ do
     mapVal <- toJSVal mapEl
     maps <- getMaps
     options <- makeObject mapOptions
     gMapCons <- maps ! "Map"
     new gMapCons (mapVal, options)
-    return ()
