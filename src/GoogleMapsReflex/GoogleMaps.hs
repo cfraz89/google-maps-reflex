@@ -15,56 +15,31 @@ import Data.Default
 import Data.Functor
 
 import Reflex.Dom.Core
+import GoogleMapsReflex.Common
+import GoogleMapsReflex.Types
 
-data LatLng = LatLng { 
-    _latLng_lat :: Double,
-    _latLng_lng :: Double
-    }
-
-instance ToJSVal LatLng where
-    toJSVal latLng = do
-        maps <- getMaps
-        latlngCons <- maps ! "LatLng"
-        new latlngCons (ValNumber (_latLng_lat latLng), ValNumber (_latLng_lng latLng))
-
-data MapOptions = MapOptions {
-    _mapOptions_center :: LatLng,
-    _mapOptions_zoom :: Double
-}
-
-instance MakeObject MapOptions where
-    makeObject options = do
-        optionsVal <- create
-        latLng <- toJSVal (_mapOptions_center options)
-        optionsVal <# "center" $ latLng
-        optionsVal <# "zoom" $ ValNumber (_mapOptions_zoom options)
-        return optionsVal
-
-instance Default MapOptions where
-    def = MapOptions (LatLng 0 0) 1
-
- --Map a trigger event to an event for when maps is ready
-loadMaps :: (MonadWidget t m) => Event t () -> m (Event t ())
-loadMaps event = performEventAsync (event $> insertMapsHandler)
+--Map a trigger event to an event for when maps is ready
+loadMaps :: (MonadWidget t m) => String -> Event t () -> m (Event t ())
+loadMaps mapsKey event = performEventAsync (event $> insertMapsHandler mapsKey)
 
 --Insert mapsLoaded global function which will fire event trigger when maps script loaded, or immediately when alerady exists
-insertMapsHandler :: (MonadJSM m) => (() -> IO()) -> m ()
-insertMapsHandler eventTrigger = liftJSM $ do
+insertMapsHandler :: (MonadJSM m) => String -> (() -> IO()) -> m ()
+insertMapsHandler mapsKey eventTrigger = liftJSM $ do
     --Check if we've done this before
     mapsLoaded <- getProp (toJSString "mapsLoaded") global
     mapsLoadedUndefined <- valIsUndefined mapsLoaded
     if mapsLoadedUndefined
         then do
             global <# "mapsLoaded" $ loadHandler eventTrigger
-            insertMapsScript
+            insertMapsScript mapsKey
         else liftIO $ eventTrigger ()
 
 --Insert the maps script 
-insertMapsScript :: (MonadJSM m) => m ()
-insertMapsScript = liftJSM $ do
+insertMapsScript :: (MonadJSM m) => String -> m ()
+insertMapsScript mapsKey = liftJSM $ do
     document <- currentDocumentUnchecked
     scriptNode <- createElement document "script"
-    setAttribute scriptNode "src" "https://maps.googleapis.com/maps/api/js?key=AIzaSyAICO6iAKceOhFrLywgs77HnJWwl64frFA&callback=mapsLoaded"
+    setAttribute scriptNode "src" $ "https://maps.googleapis.com/maps/api/js?key=" ++ mapsKey ++ "&callback=mapsLoaded"
     setAttribute scriptNode "async" "true"
     setAttribute scriptNode "defer" "true"
     body <- getBodyUnchecked document
@@ -74,9 +49,6 @@ insertMapsScript = liftJSM $ do
 --The actual mapsloaded function - just fire the event
 loadHandler :: (() -> IO ()) -> JSM Function
 loadHandler eventTrigger = asyncFunction $ \ _ _ _ -> liftIO $ eventTrigger ()
-
-getMaps :: JSM JSVal
-getMaps = jsg "google" ! "maps"
 
 -- Maps Functions
 

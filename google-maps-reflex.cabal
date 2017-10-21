@@ -16,7 +16,9 @@ cabal-version:       >=1.10
 library
   hs-source-dirs:      src
   exposed-modules:     GoogleMapsReflex.GoogleMaps,
+                       GoogleMapsReflex.Types
                        GoogleMapsReflex.Widget
+  other-modules:       GoogleMapsReflex.Common
   build-depends:       base >= 4.7 && < 5,
                        jsaddle,
                        jsaddle-dom,
@@ -24,7 +26,8 @@ library
                        reflex,
                        reflex-dom,
                        text,
-                       data-default
+                       data-default,
+                       ref-tf
   default-language:    Haskell2010
 
 
