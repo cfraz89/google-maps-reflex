@@ -61,26 +61,29 @@ loadHandler eventTrigger = liftJSM $ asyncFunction fireEvent
 
 -- Maps Functions
 type  Mapsable t m = (MonadJSM m, MonadJSM (Performable m), PerformEvent t m, Reflex t, DomBuilder t m, MonadHold t m, MonadIO (Performable m))
-makeMapManaged :: (Mapsable t m, ToJSVal e) => e -> Config t -> m JSVal
-makeMapManaged mapEl config = do
+makeMapManaged :: (Mapsable t m, ToJSVal e) => e -> Event t Config -> m (Event t JSVal)
+makeMapManaged mapEl config = performEvent $ ffor config (makeM mapEl)
+
+makeM :: (MonadJSM m, ToJSVal e) => e -> Config -> m JSVal
+makeM mapEl config = liftJSM $ do
     mapVal <- createMap mapEl config
     manageMarkers mapVal (_config_markers config)
     return mapVal
 
-createMap :: (MonadJSM m, ToJSVal e) => e -> Config t -> m JSVal
-createMap mapEl config = liftJSM $ do
+createMap :: (ToJSVal e) => e -> Config -> JSM JSVal
+createMap mapEl config = do
     mapVal <- toJSVal mapEl
     maps <- getMaps
     options <- makeObject $ _config_mapOptions config
     gMapCons <- maps ! "Map"
     new gMapCons (mapVal, options)
 
-manageMarkers :: Mapsable t m  => JSVal -> Dynamic t [MarkerOptions] -> m (Event t [JSVal])
-manageMarkers mapVal markers = performEvent $ ffor (updated markers) $ \optionsList -> liftJSM $ do
+manageMarkers :: JSVal -> [MarkerOptions] -> JSM [JSVal]
+manageMarkers mapVal markers = do
     maps <- getMaps
     markerCons <- maps ! "Marker"
-    liftIO $ putStrLn $ "Adding markers" ++ (show optionsList)
-    forM optionsList $ \options -> do
+    liftIO $ putStrLn $ "Adding markers" ++ (show markers)
+    forM markers $ \options -> do
         optionsVal <- create
         position <- toJSVal (_markerOptions_position options)
         optionsVal <# "position" $ position

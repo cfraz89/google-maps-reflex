@@ -15,19 +15,14 @@ import Data.Functor
 import JSDOM
 import GoogleMapsReflex.Types
 
-mapsWidget :: (MonadWidget t m, PerformEvent t m, TriggerEvent t m) => ApiKey -> Config t -> m ()
+mapsWidget :: (MonadWidget t m, PerformEvent t m, TriggerEvent t m) => ApiKey -> Dynamic t Config -> m ()
 mapsWidget apiKey config = do
     (mapEl, _) <- elAttr' "div" [
         ("id", "map"),
         ("style", "width: 300px; height: 300px;")
         ] blank
-    pb <- getPostBuild >>= delay 0.01
-    pb2 <- getPostBuild >>= delay 0.02
-    pbDyn <- holdDyn () pb2
-    maps <- loadMaps apiKey pb
-    let configAfterPB = config { 
-        _config_markers = join (pbDyn $> (_config_markers config))
-    }
-    let mapScript = (maps $> (makeMapManaged (_element_raw mapEl) configAfterPB $> ()))
-    widgetHold blank mapScript 
+    maps <- loadMaps apiKey (updated config $> ())
+    --let mergedConfig = zipDynWith (\_ c -> c) mapsDyn config
+    mapScript <- makeMapManaged (_element_raw mapEl) (tag (current config) maps)
+    --widgetHold blank (mapScript $> ())
     return ()

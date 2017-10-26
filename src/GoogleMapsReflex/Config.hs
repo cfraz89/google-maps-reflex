@@ -7,10 +7,10 @@ import Data.Default
 
 newtype ApiKey = ApiKey String
 
-data Config t = Config {
+data Config = Config {
     _config_mapOptions :: MapOptions,
-    _config_markers :: Dynamic t [MarkerOptions]
+    _config_markers :: [MarkerOptions]
 }
 
-instance Reflex t => Default (Config t) where
-    def = Config def (constDyn [])
+instance Default Config where
+    def = Config def []
