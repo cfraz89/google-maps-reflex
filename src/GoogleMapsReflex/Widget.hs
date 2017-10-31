@@ -22,7 +22,8 @@ mapsWidget apiKey config = do
         ("style", "width: 300px; height: 300px;")
         ] blank
     maps <- loadMaps apiKey (updated config $> ())
-    --let mergedConfig = zipDynWith (\_ c -> c) mapsDyn config
-    mapScript <- makeMapManaged (_element_raw mapEl) (tag (current config) maps)
-    --widgetHold blank (mapScript $> ())
+    mapsLoaded <- holdDyn Nothing (maps $> (Just ()))
+    let mergedConfig = zipDyn mapsLoaded config
+    let configAfterMaps = fmapMaybe (\(a, b) -> a $> b) (updated mergedConfig)
+    makeMapManaged (_element_raw mapEl) configAfterMaps
     return ()
