@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE OverloadedLists #-}
 {-# LANGUAGE NoMonomorphismRestriction #-}
 {-# LANGUAGE FlexibleContexts #-}
 
@@ -13,17 +11,14 @@ import GoogleMapsReflex.Config
 import qualified Data.Text as T
 import Data.Functor
 import JSDOM
+import qualified JSDOM.Types as JDT
 import GoogleMapsReflex.Types
 
-mapsWidget :: (MonadWidget t m, PerformEvent t m, TriggerEvent t m) => ApiKey -> Dynamic t Config -> m ()
-mapsWidget apiKey config = do
-    (mapEl, _) <- elAttr' "div" [
-        ("id", "map"),
-        ("style", "width: 300px; height: 300px;")
-        ] blank
+googleMaps :: (MonadWidget t m, PerformEvent t m, TriggerEvent t m) => JDT.Element -> ApiKey -> Dynamic t Config -> m ()
+googleMaps el apiKey config = do
     maps <- loadMaps apiKey (updated config $> ())
     mapsLoaded <- holdDyn Nothing (maps $> (Just ()))
     let mergedConfig = zipDyn mapsLoaded config
     let configAfterMaps = fmapMaybe (\(a, b) -> a $> b) (updated mergedConfig)
-    makeMapManaged (_element_raw mapEl) configAfterMaps
+    makeMapManaged el configAfterMaps
     return ()
