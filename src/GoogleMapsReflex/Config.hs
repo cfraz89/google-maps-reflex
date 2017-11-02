@@ -10,7 +10,7 @@ newtype ApiKey = ApiKey String
 data Config = Config {
     _config_mapOptions :: MapOptions,
     _config_markers :: [MarkerOptions]
-}
+} deriving (Eq, Ord)
 
 instance Default Config where
     def = Config def []

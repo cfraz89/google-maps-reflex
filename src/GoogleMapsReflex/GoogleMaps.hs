@@ -1,6 +1,7 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE NoMonomorphismRestriction #-}
+{-# LANGUAGE GADTs #-}
 
 module GoogleMapsReflex.GoogleMaps where
 
@@ -18,6 +19,8 @@ import JSDOM.Generated.Node (appendChild)
 import JSDOM.Types hiding (Function, Event)
 import Data.Default
 import Data.Functor
+import Control.Monad.Fix
+import qualified Data.Dependent.Map as DM
 import qualified Data.Text as T
 
 import Reflex.Dom.Core
@@ -59,16 +62,29 @@ loadHandler :: MonadJSM m => (() -> IO ()) -> m Function
 loadHandler eventTrigger = liftJSM $ asyncFunction fireEvent
     where fireEvent _ _ _ = liftIO $ eventTrigger ()
 
+data Phase = Creation | Update JSVal
+data ConfigPhase = ConfigPhase Config Phase
+
 -- Maps Functions
 type  Mapsable t m = (MonadJSM m, MonadJSM (Performable m), PerformEvent t m, Reflex t, DomBuilder t m, MonadHold t m, MonadIO (Performable m))
-makeMapManaged :: (Mapsable t m, ToJSVal e) => e -> Event t Config -> m (Event t JSVal)
-makeMapManaged mapEl config = performEvent $ ffor config (makeM mapEl)
+makeMapManaged :: (Mapsable t m, ToJSVal e, MonadFix m) => e -> Event t Config -> m (Event t JSVal)
+makeMapManaged mapEl config = do
+    (head, tail) <- headTailE config
+    let headConfig = (\c -> makeM mapEl (ConfigPhase c Creation)) <$> head
+    mapCreateEvent <- performEvent headConfig
+    emptyVal <- liftJSM $ create >>= toJSVal
+    mapVal <- hold emptyVal mapCreateEvent
+    let tailConfig = attachWith (\v c -> makeM mapEl (ConfigPhase c (Update v))) mapVal tail
+    performEvent tailConfig
 
-makeM :: (MonadJSM m, ToJSVal e) => e -> Config -> m JSVal
-makeM mapEl config = liftJSM $ do
-    mapVal <- createMap mapEl config
-    manageMarkers mapVal (_config_markers config)
-    return mapVal
+makeM :: (MonadJSM m, ToJSVal e) => e -> ConfigPhase -> m JSVal
+makeM mapEl (ConfigPhase config phase) = liftJSM $ do 
+        mapVal <- valForPhase phase
+        manageMarkers mapVal (_config_markers config)
+        return mapVal
+    where
+        valForPhase Creation = createMap mapEl config
+        valForPhase (Update val) = return val
 
 createMap :: (ToJSVal e) => e -> Config -> JSM JSVal
 createMap mapEl config = do

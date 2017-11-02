@@ -11,7 +11,7 @@ import qualified Data.Text as T
 data LatLng = LatLng { 
     _latLng_lat :: Double,
     _latLng_lng :: Double
- } deriving Show
+ } deriving (Show, Eq, Ord)
 
 instance ToJSVal LatLng where
     toJSVal latLng = do
@@ -24,7 +24,7 @@ instance ToJSVal LatLng where
 data MapOptions = MapOptions {
     _mapOptions_center :: LatLng,
     _mapOptions_zoom :: Double
-} deriving Show
+} deriving (Show, Eq, Ord)
 
 instance MakeObject MapOptions where
     makeObject options = do
@@ -42,4 +42,4 @@ instance Default MapOptions where
 data MarkerOptions = MarkerOptions {
     _markerOptions_position :: LatLng,
     _markerOptions_title :: T.Text
-} deriving Show
+} deriving (Show, Eq, Ord)

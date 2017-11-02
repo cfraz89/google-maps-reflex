@@ -19,7 +19,8 @@ library
                        GoogleMapsReflex.Types,
                        GoogleMapsReflex.Widget,
                        GoogleMapsReflex.Config
-  other-modules:       GoogleMapsReflex.Common
+  other-modules:       GoogleMapsReflex.Common,
+                       GoogleMapsReflex.DMaps.ConfigKey
   build-depends:       base >= 4.7 && < 5,
                        jsaddle,
                        jsaddle-dom,
@@ -28,7 +29,9 @@ library
                        reflex-dom,
                        text,
                        data-default,
-                       ref-tf
+                       ref-tf,
+                       dependent-sum-template,
+                       dependent-map
   default-language:    Haskell2010
 
 
