@@ -1,4 +1,4 @@
-module GoogleMapsReflex.Types where
+module GoogleMapsReflex.JSTypes where
     
 import Language.Javascript.JSaddle.Object
 import Language.Javascript.JSaddle.Types

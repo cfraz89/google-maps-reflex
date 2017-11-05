@@ -1,7 +1,7 @@
 {-# LANGUAGE NoMonomorphismRestriction #-}
 module GoogleMapsReflex.Config where
 
-import GoogleMapsReflex.Types
+import GoogleMapsReflex.JSTypes
 import Reflex
 import Data.Default
 

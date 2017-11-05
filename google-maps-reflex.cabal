@@ -16,11 +16,11 @@ cabal-version:       >=1.10
 library
   hs-source-dirs:      src
   exposed-modules:     GoogleMapsReflex.GoogleMaps,
-                       GoogleMapsReflex.Types,
+                       GoogleMapsReflex.JSTypes,
                        GoogleMapsReflex.Widget,
                        GoogleMapsReflex.Config
   other-modules:       GoogleMapsReflex.Common,
-                       GoogleMapsReflex.DMaps.ConfigKey
+                       GoogleMapsReflex.MapsLoader
   build-depends:       base >= 4.7 && < 5,
                        jsaddle,
                        jsaddle-dom,

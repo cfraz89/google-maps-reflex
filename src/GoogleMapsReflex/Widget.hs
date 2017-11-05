@@ -8,11 +8,11 @@ import Reflex.Dom
 import Control.Monad
 import GoogleMapsReflex.GoogleMaps
 import GoogleMapsReflex.Config
+import GoogleMapsReflex.MapsLoader
 import qualified Data.Text as T
 import Data.Functor
 import JSDOM
 import qualified JSDOM.Types as JDT
-import GoogleMapsReflex.Types
 
 googleMaps :: (MonadWidget t m, PerformEvent t m, TriggerEvent t m) => JDT.Element -> ApiKey -> Dynamic t Config -> m ()
 googleMaps el apiKey config = do
