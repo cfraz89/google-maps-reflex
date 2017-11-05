@@ -2,6 +2,7 @@
 {-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE NoMonomorphismRestriction #-}
 {-# LANGUAGE GADTs #-}
+{-# LANGUAGE RecursiveDo #-}
 
 module GoogleMapsReflex.GoogleMaps where
 
@@ -62,29 +63,28 @@ loadHandler :: MonadJSM m => (() -> IO ()) -> m Function
 loadHandler eventTrigger = liftJSM $ asyncFunction fireEvent
     where fireEvent _ _ _ = liftIO $ eventTrigger ()
 
-data Phase = Creation | Update JSVal
-data ConfigPhase = ConfigPhase Config Phase
+data MapsState = MapsState {
+    _mapsState_mapVal :: Maybe JSVal,
+    _mapsState_markers ::[JSVal]
+}
 
 -- Maps Functions
 type  Mapsable t m = (MonadJSM m, MonadJSM (Performable m), PerformEvent t m, Reflex t, DomBuilder t m, MonadHold t m, MonadIO (Performable m))
-makeMapManaged :: (Mapsable t m, ToJSVal e, MonadFix m) => e -> Event t Config -> m (Event t JSVal)
-makeMapManaged mapEl config = do
-    (head, tail) <- headTailE config
-    let headConfig = (\c -> makeM mapEl (ConfigPhase c Creation)) <$> head
-    mapCreateEvent <- performEvent headConfig
-    emptyVal <- liftJSM $ create >>= toJSVal
-    mapVal <- hold emptyVal mapCreateEvent
-    let tailConfig = attachWith (\v c -> makeM mapEl (ConfigPhase c (Update v))) mapVal tail
-    performEvent tailConfig
 
-makeM :: (MonadJSM m, ToJSVal e) => e -> ConfigPhase -> m JSVal
-makeM mapEl (ConfigPhase config phase) = liftJSM $ do 
-        mapVal <- valForPhase phase
-        manageMarkers mapVal (_config_markers config)
-        return mapVal
+makeMapManaged :: (Mapsable t m, ToJSVal e, MonadFix m) => e -> Event t Config -> m (Event t MapsState)
+makeMapManaged mapEl config = mdo
+    mapsStateEvent <- performEvent $ attachWith (\s c -> updateMapState mapEl c s) (current mapsStateDyn) config
+    mapsStateDyn <- holdDyn (MapsState Nothing []) mapsStateEvent
+    return mapsStateEvent
+
+updateMapState :: (MonadJSM m, ToJSVal e) => e -> Config -> MapsState -> m MapsState
+updateMapState mapEl config (MapsState mapVal markers) = liftJSM $ do 
+        mapVal <- valForState mapVal
+        markers <- manageMarkers mapVal (_config_markers config) markers
+        return $ MapsState (Just mapVal) markers
     where
-        valForPhase Creation = createMap mapEl config
-        valForPhase (Update val) = return val
+        valForState Nothing = createMap mapEl config
+        valForState (Just val) = return val
 
 createMap :: (ToJSVal e) => e -> Config -> JSM JSVal
 createMap mapEl config = do
@@ -94,8 +94,9 @@ createMap mapEl config = do
     gMapCons <- maps ! "Map"
     new gMapCons (mapVal, options)
 
-manageMarkers :: JSVal -> [MarkerOptions] -> JSM [JSVal]
-manageMarkers mapVal markers = do
+manageMarkers :: JSVal -> [MarkerOptions] -> [JSVal] -> JSM [JSVal]
+manageMarkers mapVal markers existing = do
+    forM existing $ \m -> m # "setMap" $ [JSNull]
     maps <- getMaps
     markerCons <- maps ! "Marker"
     liftIO $ putStrLn $ "Adding markers" ++ (show markers)
