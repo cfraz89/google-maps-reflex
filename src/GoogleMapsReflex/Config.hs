@@ -2,7 +2,6 @@
 module GoogleMapsReflex.Config where
 
 import GoogleMapsReflex.JSTypes
-import Reflex
 import Data.Default
 
 newtype ApiKey = ApiKey String

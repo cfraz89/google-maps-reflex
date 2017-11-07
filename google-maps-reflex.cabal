@@ -19,8 +19,8 @@ library
                        GoogleMapsReflex.JSTypes,
                        GoogleMapsReflex.Widget,
                        GoogleMapsReflex.Config
-  other-modules:       GoogleMapsReflex.Common,
-                       GoogleMapsReflex.MapsLoader
+  other-modules:       GoogleMapsReflex.MapsLoader,
+                       GoogleMapsReflex.MapsApi
   build-depends:       base >= 4.7 && < 5,
                        jsaddle,
                        jsaddle-dom,

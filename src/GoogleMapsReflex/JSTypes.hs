@@ -1,12 +1,13 @@
 module GoogleMapsReflex.JSTypes where
     
 import Language.Javascript.JSaddle.Object
-import Language.Javascript.JSaddle.Types
-import Language.Javascript.JSaddle.String
 import Language.Javascript.JSaddle.Value
+import Language.Javascript.JSaddle.Types
 import Data.Default
-import GoogleMapsReflex.Common
 import qualified Data.Text as T
+
+googleMaps :: JSM JSVal
+googleMaps = jsg "google" ! "maps"
 
 data LatLng = LatLng { 
     _latLng_lat :: Double,
@@ -15,7 +16,7 @@ data LatLng = LatLng {
 
 instance ToJSVal LatLng where
     toJSVal latLng = do
-        maps <- getMaps
+        maps <- googleMaps
         latlngCons <- maps ! "LatLng"
         new latlngCons (ValNumber (_latLng_lat latLng), ValNumber (_latLng_lng latLng))
 

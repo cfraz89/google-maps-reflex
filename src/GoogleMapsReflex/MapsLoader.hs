@@ -21,7 +21,7 @@ import Control.Monad.IO.Class
 loadMaps :: (MonadWidget t m) => ApiKey -> Event t () -> m (Event t ())
 loadMaps mapsKey event = performEventAsync (event $> insertMapsHandler mapsKey)
 
---Insert mapsLoaded global function which will fire event trigger when maps script loaded, or immediately when alerady exists
+--Insert mapsLoaded global function which will fire event trigger when maps script loaded, or immediately when already exists
 insertMapsHandler :: MonadJSM m => ApiKey -> (() -> IO()) -> m ()
 insertMapsHandler mapsKey eventTrigger = liftJSM $ do
     --Check if we've done this before
