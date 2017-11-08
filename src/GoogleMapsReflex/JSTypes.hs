@@ -6,8 +6,8 @@ import Language.Javascript.JSaddle.Types
 import Data.Default
 import qualified Data.Text as T
 
-googleMaps :: JSM JSVal
-googleMaps = jsg "google" ! "maps"
+googleMapsVal :: JSM JSVal
+googleMapsVal = jsg "google" ! "maps"
 
 data LatLng = LatLng { 
     _latLng_lat :: Double,
@@ -16,9 +16,9 @@ data LatLng = LatLng {
 
 instance ToJSVal LatLng where
     toJSVal latLng = do
-        maps <- googleMaps
+        maps <- googleMapsVal
         latlngCons <- maps ! "LatLng"
-        new latlngCons (ValNumber (_latLng_lat latLng), ValNumber (_latLng_lng latLng))
+        new latlngCons (val (_latLng_lat latLng), val (_latLng_lng latLng))
 
 ----
 
@@ -32,7 +32,7 @@ instance MakeObject MapOptions where
         optionsVal <- create
         latLng <- toJSVal (_mapOptions_center options)
         optionsVal <# "center" $ latLng
-        optionsVal <# "zoom" $ ValNumber (_mapOptions_zoom options)
+        optionsVal <# "zoom" $ val (_mapOptions_zoom options)
         return optionsVal
 
 instance Default MapOptions where

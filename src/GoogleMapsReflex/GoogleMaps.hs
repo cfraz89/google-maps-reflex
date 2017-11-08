@@ -19,40 +19,41 @@ import GoogleMapsReflex.JSTypes
 import GoogleMapsReflex.Config
 import GoogleMapsReflex.MapsApi
 
+import qualified JSDOM.Types as JDT
+
 data MapsState = MapsState {
     _mapsState_mapVal :: Maybe JSVal,
     _mapsState_markers ::[JSVal]
 }
 
--- Maps Functions
-type  Mapsable t m = (MonadJSM m, MonadJSM (Performable m), PerformEvent t m, Reflex t, DomBuilder t m, MonadHold t m, MonadIO (Performable m))
+type  Mapsable t m = (
+    MonadJSM m,
+    MonadJSM (Performable m),
+    PerformEvent t m,
+    Reflex t,
+    DomBuilder t m,
+    MonadHold t m,
+    MonadIO (Performable m),
+    MonadFix m
+   )
 
-makeMapManaged :: (Mapsable t m, ToJSVal e, MonadFix m) => e -> Event t Config -> m (Event t MapsState)
+-- Maps Functions
+makeMapManaged :: Mapsable t m => JDT.Element -> Event t Config -> m (Event t MapsState)
 makeMapManaged mapEl config = mdo
     mapsStateEvent <- performEvent $ attachWith (flip $ updateMapState mapEl) mapsStateBehavior config
     mapsStateBehavior <- hold (MapsState Nothing []) mapsStateEvent
     return mapsStateEvent
 
-updateMapState :: (MonadJSM m, ToJSVal e) => e -> Config -> MapsState -> m MapsState
+updateMapState :: MonadJSM m => JDT.Element -> Config -> MapsState -> m MapsState
 updateMapState mapEl config (MapsState mapVal markers) = liftJSM $ do 
-        mapVal <- valForState mapVal
-        markers <- manageMarkers mapVal (_config_markers config) markers
-        return $ MapsState (Just mapVal) markers
+        newMapVal <- valForState mapVal
+        newMarkers <- manageMarkers newMapVal (_config_markers config) markers
+        return $ MapsState (Just newMapVal) newMarkers
     where
         valForState Nothing = createMap mapEl (_config_mapOptions config)
-        valForState (Just val) = return val
+        valForState (Just v) = setOptions v (_config_mapOptions config) >> return v
 
 manageMarkers :: JSVal -> [MarkerOptions] -> [JSVal] -> JSM [JSVal]
 manageMarkers mapVal markers existing = do
     forM_ existing $ \m -> m # "setMap" $ [JSNull]
-    maps <- googleMaps
-    markerCons <- maps ! "Marker"
-    liftIO $ putStrLn $ "Adding markers" ++ show markers
-    forM markers $ \options -> do
-        optionsVal <- create
-        position <- toJSVal (_markerOptions_position options)
-        optionsVal <# "position" $ position
-        optionsVal <# "title" $ ValString (_markerOptions_title options)
-        optionsVal <# "map" $ mapVal
-        liftIO $ putStrLn "Added a marker"
-        new markerCons (ValObject optionsVal)
+    forM markers $ createMarker mapVal
