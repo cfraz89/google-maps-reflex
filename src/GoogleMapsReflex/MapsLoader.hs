@@ -25,18 +25,16 @@ loadMaps mapsKey event = performEventAsync (event $> insertMapsHandler mapsKey)
 insertMapsHandler :: MonadJSM m => ApiKey -> (() -> IO()) -> m ()
 insertMapsHandler mapsKey eventTrigger = liftJSM $ do
     --Check if we've done this before
-    mapsLoaded <- getProp (toJSString "mapsLoaded") global
-    mapsLoadedUndefined <- valIsUndefined mapsLoaded
+    mapsLoadedUndefined <- valIsUndefined $ getProp (toJSString "mapsLoaded") global
     if mapsLoadedUndefined
         then do
-            lh <- loadHandler eventTrigger
-            global <# "mapsLoaded" $ lh
+            global <# "mapsLoaded" $ loadHandler eventTrigger
             insertMapsScript mapsKey
         else liftIO $ eventTrigger ()
 
 --Insert the maps script 
-insertMapsScript :: (MonadJSM m) => ApiKey -> m ()
-insertMapsScript (ApiKey mapsKey) = liftJSM $ do
+insertMapsScript :: ApiKey -> JSM ()
+insertMapsScript (ApiKey mapsKey) = do
     document <- currentDocumentUnchecked
     scriptNode <- createElement document "script"
     setAttribute scriptNode "src" $ "https://maps.googleapis.com/maps/api/js?key=" ++ mapsKey ++ "&callback=mapsLoaded"
@@ -47,6 +45,6 @@ insertMapsScript (ApiKey mapsKey) = liftJSM $ do
     return ()
 
 --The actual mapsloaded function - just fire the event
-loadHandler :: MonadJSM m => (() -> IO ()) -> m Function
-loadHandler eventTrigger = liftJSM $ asyncFunction fireEvent
+loadHandler :: (() -> IO ()) -> JSM Function
+loadHandler eventTrigger = asyncFunction fireEvent
     where fireEvent _ _ _ = liftIO $ eventTrigger ()

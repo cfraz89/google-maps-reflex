@@ -8,27 +8,14 @@ import Language.Javascript.JSaddle.Value
 import JSDOM.Types
 
 createMap :: Element -> MapOptions -> JSM JSVal
-createMap mapEl mapOptions = do
-    mapVal <- toJSVal mapEl
-    maps <- googleMapsVal
-    options <- makeObject mapOptions
-    gMapCons <- maps ! "Map"
-    new gMapCons (mapVal, options)
+createMap mapEl mapOptions = new (gmaps ! "Map") (mapEl, makeObject mapOptions)
 
 createMarker :: JSVal -> MarkerOptions -> JSM JSVal
 createMarker mapVal options = do
-    maps <- googleMapsVal
-    markerCons <- maps ! "Marker"
-    optionsVal <- create
-    position <- toJSVal (_markerOptions_position options)
-    optionsVal <# "position" $ position
-    optionsVal <# "title" $ val (_markerOptions_title options)
+    optionsVal <- makeObject options
     optionsVal <# "map" $ mapVal
-    new markerCons (ValObject optionsVal)
+    new (gmaps ! "Marker") (val optionsVal)
 
 
-setOptions :: JSVal -> MapOptions -> JSM ()
-setOptions mapVal mapOptions = do
-    options <- makeObject mapOptions
-    mapVal # "setOptions" $ val options
-    return ()
+setOptions :: JSVal -> MapOptions -> JSM JSVal
+setOptions mapVal mapOptions = mapVal # "setOptions" $ val (makeObject mapOptions) 

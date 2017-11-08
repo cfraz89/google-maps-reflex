@@ -1,10 +1,3 @@
-(import ../reflex-platform {}).project ({ pkgs, ... }: {
-  packages = {
-    maps = ./.;
-  };
+with import ../reflex-platform {};
 
-  shells = {
-    ghc = ["maps"];
-    ghcjs = ["maps"];
-  };
-})
+ghc.callPackage ./google-maps-reflex.nix {}
