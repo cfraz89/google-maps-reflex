@@ -40,12 +40,12 @@ type  Mapsable t m = (
 -- Maps Functions
 makeMapManaged :: Mapsable t m => JDT.Element -> Event t Config -> m (Event t MapsState)
 makeMapManaged mapEl config = mdo
-    mapsStateEvent <- performEvent $ attachWith (flip $ updateMapState mapEl) mapsStateBehavior config
+    mapsStateEvent <- performEvent $ attachWith (updateMapState mapEl) mapsStateBehavior config
     mapsStateBehavior <- hold (MapsState Nothing []) mapsStateEvent
     return mapsStateEvent
 
-updateMapState :: MonadJSM m => JDT.Element -> Config -> MapsState -> m MapsState
-updateMapState mapEl config (MapsState mapVal markers) = liftJSM $ do 
+updateMapState :: MonadJSM m => JDT.Element -> MapsState -> Config -> m MapsState
+updateMapState mapEl (MapsState mapVal markers) config = liftJSM $ do 
         newMapVal <- valForState mapVal
         newMarkers <- manageMarkers newMapVal (_config_markers config) markers
         return $ MapsState (Just newMapVal) newMarkers

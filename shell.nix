@@ -1,3 +1,8 @@
+with import <nixpkgs> {};
 with import ../reflex-platform {};
 
-workOn ghc (ghc.callPackage ./google-maps-reflex.nix {})
+let 
+    hie = ghc.callPackage ./hie.nix {};
+    project = haskell.lib.addBuildTools (ghc.callPackage ./google-maps-reflex.nix {}) [hie];
+in
+workOn ghc project

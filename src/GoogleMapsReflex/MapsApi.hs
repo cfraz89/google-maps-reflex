@@ -1,6 +1,7 @@
 module GoogleMapsReflex.MapsApi where
 
 import GoogleMapsReflex.JSTypes
+import GoogleMapsReflex.Common
 
 import Language.Javascript.JSaddle.Object
 import Language.Javascript.JSaddle.Types
