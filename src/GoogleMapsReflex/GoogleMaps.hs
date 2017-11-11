@@ -18,12 +18,15 @@ import Reflex.Dom.Core
 import GoogleMapsReflex.JSTypes
 import GoogleMapsReflex.Config
 import GoogleMapsReflex.MapsApi
+import Data.Functor
+import Data.Maybe
 
 import qualified JSDOM.Types as JDT
 
 data MapsState = MapsState {
+    _mapsState_mapElement :: JDT.Element,
     _mapsState_mapVal :: Maybe JSVal,
-    _mapsState_markers ::[JSVal]
+    _mapsState_markers :: [JSVal]
 }
 
 type  Mapsable t m = (
@@ -37,18 +40,21 @@ type  Mapsable t m = (
     MonadFix m
    )
 
--- Maps Functions
-makeMapManaged :: Mapsable t m => JDT.Element -> Event t Config -> m (Event t MapsState)
-makeMapManaged mapEl config = mdo
-    mapsStateEvent <- performEvent $ attachWith (updateMapState mapEl) mapsStateBehavior config
-    mapsStateBehavior <- hold (MapsState Nothing []) mapsStateEvent
-    return mapsStateEvent
+newtype GoogleMaps t = GoogleMaps (Dynamic t MapsState)
 
-updateMapState :: MonadJSM m => JDT.Element -> MapsState -> Config -> m MapsState
-updateMapState mapEl (MapsState mapVal markers) config = liftJSM $ do 
+-- Maps Functions
+makeMapManaged :: Mapsable t m => JDT.Element -> Event t Config -> m (GoogleMaps t)
+makeMapManaged mapEl config = mdo
+    let blankState = MapsState mapEl Nothing []
+    mapsStateEvent <- performEvent $ attachPromptlyDynWith updateMapState mapsStateDyn config
+    mapsStateDyn <- holdDyn blankState mapsStateEvent
+    return $ GoogleMaps mapsStateDyn
+
+updateMapState :: MonadJSM m => MapsState -> Config -> m MapsState
+updateMapState (MapsState mapEl mapVal markers) config = liftJSM $ do 
         newMapVal <- valForState mapVal
         newMarkers <- manageMarkers newMapVal (_config_markers config) markers
-        return $ MapsState (Just newMapVal) newMarkers
+        return $ MapsState mapEl (Just newMapVal) newMarkers
     where
         valForState Nothing = createMap mapEl (_config_mapOptions config)
         valForState (Just v) = setOptions v (_config_mapOptions config) >> return v
@@ -57,3 +63,8 @@ manageMarkers :: JSVal -> [MarkerOptions] -> [JSVal] -> JSM [JSVal]
 manageMarkers mapVal markers existing = do
     forM_ existing $ \m -> m # "setMap" $ [JSNull]
     forM markers $ createMarker mapVal
+
+mapClick :: MonadWidget t m => GoogleMaps t -> m (Event t ())
+mapClick (GoogleMaps state) = do
+    c <- dyn $ maybe (return never) mapValClick . _mapsState_mapVal <$> state
+    switchPromptly never c
