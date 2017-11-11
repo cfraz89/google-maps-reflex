@@ -10,9 +10,8 @@ import Language.Javascript.JSaddle.Types
 import Language.Javascript.JSaddle.Value
 import qualified JSDOM.Types as JDT
 import Reflex.Dom hiding (EventName)
-import GHCJS.DOM.EventM
-import qualified JSDOM.EventTargetClosures as ETC
-import qualified GHCJS.DOM.Types as GDT
+import JSDOM.EventM
+import JSDOM.EventTargetClosures
 
 createMap :: JDT.Element -> MapOptions -> JSM JSVal
 createMap mapEl mapOptions = new (gmaps ! "Map") (mapEl, makeObject mapOptions)
@@ -28,6 +27,6 @@ setOptions :: JSVal -> MapOptions -> JSM JSVal
 setOptions mapVal mapOptions = mapVal # "setOptions" $ val (makeObject mapOptions) 
 
 mapValClick :: (PostBuild t m, MonadJSM m, TriggerEvent t m, PerformEvent t m) => JSVal -> m (Event t ())
-mapValClick mapVal = wrapDomEvent (GDT.EventTarget mapVal) (\e eventM -> on e click eventM) (return ())
-    where click :: JDT.IsEventTarget t => ETC.EventName t GDT.Event
-          click = ETC.EventName $ JDT.toJSString "click"
+mapValClick mapVal = wrapDomEvent (JDT.EventTarget mapVal) (\e eventM -> on e click eventM) (return ())
+    where click :: JDT.IsEventTarget t => EventName t JDT.Event
+          click = EventName $ JDT.toJSString "click"
