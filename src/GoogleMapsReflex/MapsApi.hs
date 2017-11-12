@@ -9,11 +9,13 @@ import Language.Javascript.JSaddle.Object
 import Language.Javascript.JSaddle.Types
 import Language.Javascript.JSaddle.Value
 import qualified JSDOM.Types as JDT
+import qualified Data.Text as T
 import Reflex.Dom hiding (EventName)
 import JSDOM.EventM
 import JSDOM.EventTargetClosures
+import Control.Monad.IO.Class
 
-createMap :: JDT.Element -> MapOptions -> JSM JSVal
+createMap :: JDT.ToJSVal e => e -> MapOptions -> JSM JSVal
 createMap mapEl mapOptions = new (gmaps ! "Map") (mapEl, makeObject mapOptions)
 
 createMarker :: JSVal -> MarkerOptions -> JSM JSVal
@@ -22,11 +24,12 @@ createMarker mapVal options = do
     optionsVal <# "map" $ mapVal
     new (gmaps ! "Marker") (val optionsVal)
 
-
 setOptions :: JSVal -> MapOptions -> JSM JSVal
 setOptions mapVal mapOptions = mapVal # "setOptions" $ val (makeObject mapOptions) 
 
-mapValClick :: (PostBuild t m, MonadJSM m, TriggerEvent t m, PerformEvent t m) => JSVal -> m (Event t ())
-mapValClick mapVal = wrapDomEvent (JDT.EventTarget mapVal) (\e eventM -> on e click eventM) (return ())
-    where click :: JDT.IsEventTarget t => EventName t JDT.Event
-          click = EventName $ JDT.toJSString "click"
+addListener:: (MonadJSM m) => T.Text -> JSVal -> (JSVal -> IO()) -> m JSVal
+addListener eventName mapVal cb = liftJSM $ do
+    listener <- asyncFunction $ \ _ _ args -> do
+        liftIO $ putStrLn ("Event" ++ T.unpack eventName)
+        liftIO $ cb (args Prelude.!! 0)
+    gmaps ! "event" # "addListener" $ [val mapVal, val eventName, val listener]

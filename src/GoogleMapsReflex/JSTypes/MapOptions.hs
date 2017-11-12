@@ -42,7 +42,7 @@ instance MakeObject MapOptions where
 instance Default MapOptions where
     def = MapOptions {
         _mapOptions_center = LatLng 0 0,
-        _mapOptions_zoom = 20,
+        _mapOptions_zoom = 5,
         _mapOptions_backgroundColor = "#fff",
         _mapOptions_clickableIcons = True,
         _mapOptions_disableDefaultUI = False,
