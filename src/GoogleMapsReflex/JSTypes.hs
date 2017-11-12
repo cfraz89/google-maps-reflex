@@ -1,6 +1,3 @@
-{-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE LambdaCase #-}
-
 module GoogleMapsReflex.JSTypes(
     module GoogleMapsReflex.JSTypes.LatLng,
     module GoogleMapsReflex.JSTypes.MapOptions,

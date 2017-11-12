@@ -13,7 +13,7 @@ import JSDOM.Generated.Node (appendChild)
 import JSDOM.Types hiding (Function, Event)
 
 import Reflex.Dom.Core
-import GoogleMapsReflex.Config
+import GoogleMapsReflex.Types
 import Data.Functor
 import Control.Monad.IO.Class
 

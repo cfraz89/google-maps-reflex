@@ -7,7 +7,7 @@ import Language.Javascript.JSaddle.Monad
 import Reflex.Dom
 import Control.Monad
 import GoogleMapsReflex.GoogleMaps
-import GoogleMapsReflex.Config
+import GoogleMapsReflex.Types
 import GoogleMapsReflex.MapsLoader
 import qualified Data.Text as T
 import Data.Functor
