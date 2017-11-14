@@ -3,8 +3,6 @@
 module GoogleMapsReflex.JSTypes.MarkerOptions where
     
 import Language.Javascript.JSaddle.Object
-import Language.Javascript.JSaddle.Value
-import Language.Javascript.JSaddle.Types
 import Data.Text (Text)
 
 import GoogleMapsReflex.JSTypes.LatLng

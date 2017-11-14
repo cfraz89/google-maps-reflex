@@ -1,11 +1,9 @@
-{-# LANGUAGE RecordWildCards #-}
 {-# LANGUAGE LambdaCase #-}
 
 module GoogleMapsReflex.JSTypes.ControlPosition where
     
 import Language.Javascript.JSaddle.Object
 import Language.Javascript.JSaddle.Value
-import Language.Javascript.JSaddle.Types
 
 import GoogleMapsReflex.Common
 

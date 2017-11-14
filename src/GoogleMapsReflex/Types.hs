@@ -18,8 +18,8 @@ instance Default Config where
 
 data MapsState e = MapsState {
     _mapsState_mapElement :: e,
-    _mapsState_mapVal :: Maybe JSVal,
+    _mapsState_mapVal :: JSVal,
     _mapsState_markers :: [JSVal]
 }
 
-newtype GoogleMaps t e = GoogleMaps (Dynamic t (MapsState e))
+type GoogleMaps t e = Dynamic t (Maybe (MapsState e))

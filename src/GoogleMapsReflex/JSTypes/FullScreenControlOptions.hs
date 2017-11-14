@@ -3,9 +3,6 @@
 module GoogleMapsReflex.JSTypes.FullscreenControlOptions where
     
 import Language.Javascript.JSaddle.Object
-import Language.Javascript.JSaddle.Value
-import Language.Javascript.JSaddle.Types
-
 import GoogleMapsReflex.JSTypes.ControlPosition
 
 newtype FullscreenControlOptions = FullscreenControlOptions {

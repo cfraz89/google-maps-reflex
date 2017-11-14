@@ -18,13 +18,8 @@ import Reflex.Dom.Core
 import GoogleMapsReflex.JSTypes
 import GoogleMapsReflex.Types
 import GoogleMapsReflex.MapsApi
-import GoogleMapsReflex.MapsEvent
-import Data.Functor
-import Data.Maybe
-import Data.Text
 
 import qualified JSDOM.Types as JDT
-import Language.Javascript.JSaddle.Marshal.String
 
 type  Mapsable t m = (
     MonadJSM m,
@@ -40,19 +35,19 @@ type  Mapsable t m = (
 -- Maps Functions
 makeMapManaged :: (Mapsable t m, JDT.ToJSVal e) => e -> Event t Config -> m (GoogleMaps t e)
 makeMapManaged mapEl config = mdo
-    let blankState = MapsState mapEl Nothing []
-    mapsStateEvent <- performEvent $ attachPromptlyDynWith updateMapState mapsStateDyn config
-    mapsStateDyn <- holdDyn blankState mapsStateEvent
-    return $ GoogleMaps mapsStateDyn
+    mapsStateEvent <- performEvent $ attachPromptlyDynWithMaybe (updateMapState mapEl) mapsStateDyn config
+    mapsStateDyn <- holdDyn Nothing (Just <$> mapsStateEvent)
+    return mapsStateDyn
 
-updateMapState :: (MonadJSM m, JDT.ToJSVal e) => MapsState e -> Config -> m (MapsState e)
-updateMapState (MapsState mapEl mapVal markers) config = liftJSM $ do 
-        newMapVal <- valForState mapVal
+updateMapState :: (MonadJSM m, JDT.ToJSVal e) => e -> Maybe (MapsState e) -> Config -> Maybe (m (MapsState e))
+updateMapState mapEl mapsState config = Just $ liftJSM $ do 
+        newMapVal <- mapVal mapsState
         newMarkers <- manageMarkers newMapVal (_config_markers config) markers
-        return $ MapsState mapEl (Just newMapVal) newMarkers
+        return $ MapsState mapEl newMapVal newMarkers
     where
-        valForState Nothing = createMap mapEl (_config_mapOptions config)
-        valForState (Just v) = setOptions v (_config_mapOptions config) >> return v
+        mapVal Nothing = createMap mapEl (_config_mapOptions config)
+        mapVal (Just m) = let v = _mapsState_mapVal m in setOptions v (_config_mapOptions config) >> return v
+        markers = maybe [] _mapsState_markers mapsState
 
 manageMarkers :: JSVal -> [MarkerOptions] -> [JSVal] -> JSM [JSVal]
 manageMarkers mapVal markers existing = do

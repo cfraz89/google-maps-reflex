@@ -5,8 +5,6 @@ module GoogleMapsReflex.JSTypes.LatLng where
 import GoogleMapsReflex.Common
 import Language.Javascript.JSaddle.Object
 import Language.Javascript.JSaddle.Value
-import Language.Javascript.JSaddle.Types
-
 
 data LatLng = LatLng { 
     _latLng_lat :: Double,
