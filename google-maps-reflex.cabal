@@ -16,6 +16,7 @@ cabal-version:       >=1.10
 library
   hs-source-dirs:      src
   exposed-modules:     GoogleMapsReflex,
+                       GoogleMapsReflex.MapsApi,
                        GoogleMapsReflex.Widget
                        GoogleMapsReflex.Types,
                        GoogleMapsReflex.MapsEvent,
@@ -26,7 +27,6 @@ library
                        GoogleMapsReflex.JSTypes.FullscreenControlOptions,
                        GoogleMapsReflex.JSTypes.ControlPosition
   other-modules:       GoogleMapsReflex.MapsLoader,
-                       GoogleMapsReflex.MapsApi,
                        GoogleMapsReflex.Common,
                        GoogleMapsReflex.GoogleMaps
   build-depends:       base >= 4.7 && < 5,
