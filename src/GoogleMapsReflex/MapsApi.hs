@@ -24,7 +24,7 @@ createMarker mapVal options = do
 setOptions :: JSVal -> MapOptions -> JSM JSVal
 setOptions mapVal mapOptions = mapVal # "setOptions" $ val (makeObject mapOptions) 
 
-addListener :: (MonadJSM m) => T.Text -> JSVal -> (JSVal -> IO()) -> m JSVal
+addListener :: (MonadJSM m) => T.Text -> JSVal -> (JSVal -> IO ()) -> m JSVal
 addListener eventName mapVal cb = liftJSM $ do
     listener <- asyncFunction $ \ _ _ args -> do
         liftIO $ putStrLn ("Event" ++ T.unpack eventName)

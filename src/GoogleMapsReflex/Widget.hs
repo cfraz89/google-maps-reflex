@@ -21,3 +21,10 @@ googleMaps mapEl apiKey config = do
     let mergedConfig = zipDyn mapsLoaded config
     let configAfterMaps = fmapMaybe (\(a, b) -> a $> b) (updated mergedConfig)
     makeMapManaged mapEl configAfterMaps
+
+withGoogleMaps :: Reflex t => GoogleMaps t e -> (MapsState e -> a) -> Event t a
+withGoogleMaps maps f = push (\s -> return (f <$> s)) (updated maps)
+
+withGoogleMaps' :: Reflex t => GoogleMaps t e -> (Maybe (MapsState e) -> a) -> Event t a
+withGoogleMaps' maps f = push (return . Just . f) (updated maps)
+
