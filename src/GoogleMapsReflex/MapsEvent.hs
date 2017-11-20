@@ -20,7 +20,8 @@ mapsEventText = \case
     MouseMove -> "mousemove"
 
 instance ToJSVal MapsEvent where
-    toJSVal e = val $ mapsEventText e
+    toJSVal = val . mapsEventText
 
 mapsEvent :: (TriggerEvent t m, PerformEvent t m, MonadJSM (Performable m)) => MapsEvent -> GoogleMaps t e -> (MapsState e -> JSVal) -> m (Event t JSVal)
-mapsEvent me maps sel = performEventAsync $ withGoogleMaps maps (\m -> void . addListener (mapsEventText me) (sel m))
+mapsEvent me maps sel = performEventAsync $ withGoogleMaps maps pAddListener
+    where pAddListener mapsState = void . addListener (mapsEventText me) (sel mapsState)

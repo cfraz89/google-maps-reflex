@@ -1,9 +1,9 @@
 {-# LANGUAGE RecordWildCards #-}
 
-module GoogleMapsReflex.JSTypes.FullscreenControlOptions where
+module GoogleMapsReflex.JSTypes.MapOptionsTypes.FullscreenControlOptions where
     
 import Language.Javascript.JSaddle.Object
-import GoogleMapsReflex.JSTypes.ControlPosition
+import GoogleMapsReflex.JSTypes.MapOptionsTypes.ControlPosition
 
 newtype FullscreenControlOptions = FullscreenControlOptions {
     _fullscreenControlOptions_position :: ControlPosition

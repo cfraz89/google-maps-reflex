@@ -26,7 +26,5 @@ setOptions mapVal mapOptions = mapVal # "setOptions" $ val (makeObject mapOption
 
 addListener :: (MonadJSM m) => T.Text -> JSVal -> (JSVal -> IO ()) -> m JSVal
 addListener eventName mapVal cb = liftJSM $ do
-    listener <- asyncFunction $ \ _ _ args -> do
-        liftIO $ putStrLn ("Event" ++ T.unpack eventName)
-        liftIO $ cb (head args)
+    listener <- asyncFunction $ \ _ _ args -> liftIO $ cb (head args)
     gmaps ! "event" # "addListener" $ [val mapVal, val eventName, val listener]

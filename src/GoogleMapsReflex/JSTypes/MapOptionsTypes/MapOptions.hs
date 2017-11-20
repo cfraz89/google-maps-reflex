@@ -1,13 +1,14 @@
 {-# LANGUAGE RecordWildCards #-}
 
-module GoogleMapsReflex.JSTypes.MapOptions where
-    
+module GoogleMapsReflex.JSTypes.MapOptionsTypes.MapOptions where
+
 import Language.Javascript.JSaddle.Object
 import Data.Default
-
 import GoogleMapsReflex.JSTypes.LatLng
-import GoogleMapsReflex.JSTypes.FullscreenControlOptions
-import GoogleMapsReflex.JSTypes.ControlPosition
+import GoogleMapsReflex.JSTypes.MapOptionsTypes.FullscreenControlOptions
+import GoogleMapsReflex.JSTypes.MapOptionsTypes.ControlPosition
+import GoogleMapsReflex.JSTypes.MapOptionsTypes.GestureHandling
+import GoogleMapsReflex.JSTypes.MapOptionsTypes.MapType
 
 data MapOptions = MapOptions {
     _mapOptions_center :: LatLng,
@@ -19,7 +20,12 @@ data MapOptions = MapOptions {
     _mapOptions_draggableCursor :: String,
     _mapOptions_draggingCursor :: String,
     _mapOptions_fullscreenControl :: Bool,
-    _mapOptions_fullscreenControlOptions :: FullscreenControlOptions
+    _mapOptions_fullscreenControlOptions :: FullscreenControlOptions,
+    _mapOptions_gestureHandling :: GestureHandling,
+    _mapOptions_heading :: Double,
+    _mapOptions_keyboardShortcuts :: Bool,
+    _mapOptions_mapTypeControl :: Bool,
+    _mapOptions_mapTypeControlOptions :: MapTypeControlOptions
 } deriving (Show, Eq, Ord)
 
 instance MakeObject MapOptions where
@@ -35,6 +41,11 @@ instance MakeObject MapOptions where
         o <# "draggingCursor" $ _mapOptions_draggingCursor
         o <# "fullscreenControl" $ _mapOptions_fullscreenControl
         o <# "fullscreenControlOptions" $ makeObject _mapOptions_fullscreenControlOptions
+        o <# "gestureHandling" $ _mapOptions_gestureHandling
+        o <# "heading" $ _mapOptions_heading
+        o <# "keyboardShortcuts" $ _mapOptions_keyboardShortcuts
+        o <# "mapTypeControl" $ _mapOptions_mapTypeControl
+        o <# "mapTypeControlOptions" $ makeObject _mapOptions_mapTypeControlOptions
         return o
 
 instance Default MapOptions where
@@ -48,5 +59,14 @@ instance Default MapOptions where
         _mapOptions_draggableCursor = "auto",
         _mapOptions_draggingCursor = "auto",
         _mapOptions_fullscreenControl = False,
-        _mapOptions_fullscreenControlOptions = FullscreenControlOptions RightTop
+        _mapOptions_fullscreenControlOptions = FullscreenControlOptions RightTop,
+        _mapOptions_gestureHandling = Auto,
+        _mapOptions_heading = 0,
+        _mapOptions_keyboardShortcuts = True,
+        _mapOptions_mapTypeControl = False,
+        _mapOptions_mapTypeControlOptions = MapTypeControlOptions {
+            _mapTypeControlOptions_mapTypeIds = [],
+            _mapTypeControlOptions_position = TopRight,
+            _mapTypeControlOptions_style = Default
+        }
     }

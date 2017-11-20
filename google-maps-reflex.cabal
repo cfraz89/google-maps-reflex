@@ -22,10 +22,13 @@ library
                        GoogleMapsReflex.MapsEvent,
                        GoogleMapsReflex.JSTypes,
                        GoogleMapsReflex.JSTypes.LatLng,
-                       GoogleMapsReflex.JSTypes.MapOptions,
                        GoogleMapsReflex.JSTypes.MarkerOptions,
-                       GoogleMapsReflex.JSTypes.FullscreenControlOptions,
-                       GoogleMapsReflex.JSTypes.ControlPosition
+                       GoogleMapsReflex.JSTypes.MapOptionsTypes,
+                       GoogleMapsReflex.JSTypes.MapOptionsTypes.MapOptions,
+                       GoogleMapsReflex.JSTypes.MapOptionsTypes.FullscreenControlOptions,
+                       GoogleMapsReflex.JSTypes.MapOptionsTypes.ControlPosition,
+                       GoogleMapsReflex.JSTypes.MapOptionsTypes.GestureHandling,
+                       GoogleMapsReflex.JSTypes.MapOptionsTypes.MapType
   other-modules:       GoogleMapsReflex.MapsLoader,
                        GoogleMapsReflex.Common,
                        GoogleMapsReflex.GoogleMaps
