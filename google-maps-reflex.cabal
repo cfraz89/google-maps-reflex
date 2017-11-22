@@ -28,7 +28,11 @@ library
                        GoogleMapsReflex.JSTypes.MapOptionsTypes.FullscreenControlOptions,
                        GoogleMapsReflex.JSTypes.MapOptionsTypes.ControlPosition,
                        GoogleMapsReflex.JSTypes.MapOptionsTypes.GestureHandling,
-                       GoogleMapsReflex.JSTypes.MapOptionsTypes.MapType
+                       GoogleMapsReflex.JSTypes.MapOptionsTypes.MapType,
+                       GoogleMapsReflex.JSTypes.MapOptionsTypes.PanControlOptions,
+                       GoogleMapsReflex.JSTypes.MapOptionsTypes.RotateControlOptions,
+                       GoogleMapsReflex.JSTypes.MapOptionsTypes.ScaleControl
+                       GoogleMapsReflex.JSTypes.MapOptionsTypes.ZoomControlOptions
   other-modules:       GoogleMapsReflex.MapsLoader,
                        GoogleMapsReflex.Common,
                        GoogleMapsReflex.GoogleMaps

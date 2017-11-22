@@ -32,11 +32,11 @@ instance ToJSVal MapTypeId where
         Satellite -> "SATELLITE"
         Terrain -> "TERRAIN"
 
-data MapTypeControlStyle = Default | DropdownMenu | HorizontalBar
+data MapTypeControlStyle = Default_MapTypeControlStyle | DropdownMenu | HorizontalBar
     deriving (Show, Eq, Ord) 
 
 instance ToJSVal MapTypeControlStyle where
     toJSVal style = gmaps ! "MapTypeControlStyle" ! case style of
-        Default -> "DEFAULT"
+        Default_MapTypeControlStyle -> "DEFAULT"
         DropdownMenu -> "DROPDOWN_MENU"
         HorizontalBar -> "HORIZONTAL_BAR"
