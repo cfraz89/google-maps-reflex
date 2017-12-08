@@ -22,6 +22,7 @@ library
                        GoogleMapsReflex.MapsEvent,
                        GoogleMapsReflex.JSTypes,
                        GoogleMapsReflex.JSTypes.LatLng,
+                       GoogleMapsReflex.JSTypes.Size,
                        GoogleMapsReflex.JSTypes.MarkerOptions,
                        GoogleMapsReflex.JSTypes.MapOptionsTypes,
                        GoogleMapsReflex.JSTypes.MapOptionsTypes.MapOptions,
@@ -32,7 +33,8 @@ library
                        GoogleMapsReflex.JSTypes.MapOptionsTypes.PanControlOptions,
                        GoogleMapsReflex.JSTypes.MapOptionsTypes.RotateControlOptions,
                        GoogleMapsReflex.JSTypes.MapOptionsTypes.ScaleControl
-                       GoogleMapsReflex.JSTypes.MapOptionsTypes.ZoomControlOptions
+                       GoogleMapsReflex.JSTypes.MapOptionsTypes.ZoomControlOptions,
+                       GoogleMapsReflex.JSTypes.InfoWindow
   other-modules:       GoogleMapsReflex.MapsLoader,
                        GoogleMapsReflex.Common,
                        GoogleMapsReflex.GoogleMaps

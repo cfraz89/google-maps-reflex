@@ -28,3 +28,5 @@ addListener :: (MonadJSM m) => T.Text -> JSVal -> (JSVal -> IO ()) -> m JSVal
 addListener eventName mapVal cb = liftJSM $ do
     listener <- asyncFunction $ \ _ _ args -> liftIO $ cb (head args)
     gmaps ! "event" # "addListener" $ [val mapVal, val eventName, val listener]
+close :: InfoWindowVal -> JSM ()
+close (InfoWindowVal infoWindow) = () <$ (infoWindow # "close" $ ())
