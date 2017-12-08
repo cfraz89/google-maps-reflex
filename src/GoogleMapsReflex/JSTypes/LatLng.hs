@@ -9,7 +9,7 @@ import Language.Javascript.JSaddle.Value
 data LatLng = LatLng { 
     _latLng_lat :: Double,
     _latLng_lng :: Double
- } deriving (Show, Eq, Ord)
+ }
 
 instance ToJSVal LatLng where
     toJSVal LatLng{..} = new (gmaps ! "LatLng") (_latLng_lat, _latLng_lng)

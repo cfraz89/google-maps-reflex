@@ -9,13 +9,19 @@ import Reflex
 
 newtype ApiKey = ApiKey String
 
+data InfoWindowState = InfoWindowState {
+    _infoWindowState_options :: InfoWindowOptions,
+    _infoWindowState_open :: Bool
+}
+
 data Config = Config {
     _config_mapOptions :: MapOptions,
-    _config_markers :: [MarkerOptions]
-} deriving (Eq, Ord)
+    _config_markers :: [MarkerOptions],
+    _config_infoWindows :: [InfoWindowState]
+}
 
 instance Default Config where
-    def = Config def []
+    def = Config def [] []
 
 data MapsState e = MapsState {
     _mapsState_mapElement :: e,

@@ -8,7 +8,7 @@ import GoogleMapsReflex.JSTypes.MapOptionsTypes.ControlPosition
 
 data PanControlOptions = PanControlOptions {
     _panControlOptions_position :: ControlPosition
-} deriving (Show, Eq, Ord)
+}
 
 instance MakeObject PanControlOptions where
     makeObject PanControlOptions{..} = do

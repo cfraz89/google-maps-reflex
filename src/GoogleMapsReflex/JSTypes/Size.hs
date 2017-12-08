@@ -11,7 +11,7 @@ data Size = Size {
     _size_height :: Double,
     _size_widthUnit :: Maybe String,
     _size_heightUnit :: Maybe String
- } deriving (Show, Eq, Ord)
+ }
 
 
 instance ToJSVal Size where

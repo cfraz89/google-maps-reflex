@@ -8,7 +8,7 @@ import GoogleMapsReflex.Common
 
 newtype ScaleControlOptions = ScaleControlOptions {
     _scaleControlOptions_style :: ScaleControlStyle
-} deriving (Show, Eq, Ord)
+}
 
 instance MakeObject ScaleControlOptions where
     makeObject ScaleControlOptions{..} = do

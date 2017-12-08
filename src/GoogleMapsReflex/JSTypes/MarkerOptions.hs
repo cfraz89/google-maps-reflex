@@ -10,7 +10,7 @@ import GoogleMapsReflex.JSTypes.LatLng
 data MarkerOptions = MarkerOptions {
     _markerOptions_position :: LatLng,
     _markerOptions_title :: Text
-} deriving (Show, Eq, Ord)
+}
 
 instance MakeObject MarkerOptions where
     makeObject MarkerOptions{..} = do

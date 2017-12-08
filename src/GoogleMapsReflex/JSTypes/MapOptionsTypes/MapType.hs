@@ -1,5 +1,4 @@
 {-# LANGUAGE RecordWildCards #-}
-{-# LANGUAGE LambdaCase #-}
 
 module GoogleMapsReflex.JSTypes.MapOptionsTypes.MapType(MapTypeControlOptions(..), MapTypeId(..), MapTypeControlStyle(..)) where
     
@@ -12,7 +11,7 @@ data MapTypeControlOptions = MapTypeControlOptions {
     _mapTypeControlOptions_mapTypeIds :: [MapTypeId],
     _mapTypeControlOptions_position :: ControlPosition,
     _mapTypeControlOptions_style :: MapTypeControlStyle 
-} deriving (Show, Eq, Ord)
+}
 
 instance MakeObject MapTypeControlOptions where
     makeObject MapTypeControlOptions{..} = do
@@ -23,7 +22,6 @@ instance MakeObject MapTypeControlOptions where
         return o
 
 data MapTypeId = Hybrid | Roadmap | Satellite | Terrain
-    deriving (Show, Eq, Ord)
 
 instance ToJSVal MapTypeId where
     toJSVal typeId = gmaps ! "MapTypeId" ! case typeId of
@@ -33,7 +31,6 @@ instance ToJSVal MapTypeId where
         Terrain -> "TERRAIN"
 
 data MapTypeControlStyle = Default_MapTypeControlStyle | DropdownMenu | HorizontalBar
-    deriving (Show, Eq, Ord) 
 
 instance ToJSVal MapTypeControlStyle where
     toJSVal style = gmaps ! "MapTypeControlStyle" ! case style of

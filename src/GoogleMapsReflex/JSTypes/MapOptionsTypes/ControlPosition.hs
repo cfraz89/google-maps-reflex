@@ -1,5 +1,3 @@
-{-# LANGUAGE LambdaCase #-}
-
 module GoogleMapsReflex.JSTypes.MapOptionsTypes.ControlPosition where
     
 import Language.Javascript.JSaddle.Object
@@ -9,7 +7,6 @@ import GoogleMapsReflex.Common
 
 data ControlPosition = BottomCenter | BottomLeft | BottomRight | LeftBottom | LeftCenter
     | LeftTop | RightBottom | RightCenter | RightTop | TopCenter | TopLeft | TopRight
-    deriving (Show, Eq, Ord)
 
 instance ToJSVal ControlPosition where
     toJSVal cp = gmaps ! "ControlPosition" ! case cp of

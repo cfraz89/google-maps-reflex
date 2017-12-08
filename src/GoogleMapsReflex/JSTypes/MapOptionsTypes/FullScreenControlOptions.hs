@@ -7,7 +7,7 @@ import GoogleMapsReflex.JSTypes.MapOptionsTypes.ControlPosition
 
 newtype FullscreenControlOptions = FullscreenControlOptions {
     _fullscreenControlOptions_position :: ControlPosition
-} deriving (Show, Eq, Ord)
+}
 
 instance MakeObject FullscreenControlOptions where
     makeObject FullscreenControlOptions{..} = do

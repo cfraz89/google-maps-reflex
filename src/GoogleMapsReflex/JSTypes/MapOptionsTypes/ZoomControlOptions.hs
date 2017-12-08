@@ -8,7 +8,7 @@ import GoogleMapsReflex.JSTypes.MapOptionsTypes.ControlPosition
 
 data ZoomControlOptions = ZoomControlOptions {
     _zoomControlOptions_position :: ControlPosition
-} deriving (Show, Eq, Ord)
+}
 
 instance MakeObject ZoomControlOptions where
     makeObject ZoomControlOptions{..} = do

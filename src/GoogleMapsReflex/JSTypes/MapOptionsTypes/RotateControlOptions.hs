@@ -8,7 +8,7 @@ import GoogleMapsReflex.JSTypes.MapOptionsTypes.ControlPosition
 
 data RotateControlOptions = RotateControlOptions {
     _rotateControlOptions_position :: ControlPosition
-} deriving (Show, Eq, Ord)
+}
 
 instance MakeObject RotateControlOptions where
     makeObject RotateControlOptions{..} = do
