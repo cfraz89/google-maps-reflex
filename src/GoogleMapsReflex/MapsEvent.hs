@@ -22,6 +22,6 @@ mapsEventText = \case
 instance ToJSVal MapsEvent where
     toJSVal = val . mapsEventText
 
-mapsEvent :: (TriggerEvent t m, PerformEvent t m, MonadJSM (Performable m)) => MapsEvent -> GoogleMaps t e -> (MapsState e -> JSVal) -> m (Event t JSVal)
+mapsEvent :: (TriggerEvent t m, PerformEvent t m, MonadJSM (Performable m)) => MapsEvent -> GoogleMaps t k e -> (MapsState k e -> JSVal) -> m (Event t JSVal)
 mapsEvent me maps sel = performEventAsync $ withGoogleMaps maps pAddListener
     where pAddListener mapsState = void . addListener (mapsEventText me) (sel mapsState)

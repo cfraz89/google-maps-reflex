@@ -11,6 +11,8 @@ import Language.Javascript.JSaddle.Types
 import Language.Javascript.JSaddle.Value
 import Control.Monad.IO.Class
 import Control.Monad
+import Data.Map.Strict
+import qualified Data.Map.Strict as M
 
 import Control.Monad.Fix
 
@@ -34,24 +36,42 @@ type  Mapsable t m = (
    )
 
 -- Maps Functions
-makeMapManaged :: (Mapsable t m, JDT.ToJSVal e) => e -> Event t Config -> m (GoogleMaps t e)
+makeMapManaged :: (Mapsable t m, JDT.ToJSVal e, Ord k) => e -> Event t (Config k) -> m (GoogleMaps t k e)
 makeMapManaged mapEl config = mdo
     mapsStateEvent <- performEvent $ attachPromptlyDynWithMaybe (updateMapState mapEl) mapsStateDyn config
     mapsStateDyn <- holdDyn Nothing (Just <$> mapsStateEvent)
     return mapsStateDyn
 
-updateMapState :: (MonadJSM m, JDT.ToJSVal e) => e -> Maybe (MapsState e) -> Config -> Maybe (m (MapsState e))
+updateMapState :: (MonadJSM m, JDT.ToJSVal e, Ord k) => e -> Maybe (MapsState k e) -> Config k -> Maybe (m (MapsState k e))
 updateMapState mapEl mapsState config = Just $ liftJSM $ do 
-        newMapVal <- mapVal mapsState
-        newMarkers <- manageMarkers newMapVal (_config_markers config) markers
-        return $ MapsState mapEl newMapVal newMarkers
+    mapVal' <- makeOrUpdateMap mapsState
+    markers' <- manageMarkers mapVal' (_config_markers config) markerVals
+    infoWindows' <- manageInfoWindows mapVal' (_config_infoWindows config) infoWindowVals
+    return $ MapsState mapEl mapVal' markers' infoWindows'
     where
-        mapVal Nothing = createMap mapEl (_config_mapOptions config)
-        mapVal (Just m) = let v = _mapsState_mapVal m in setOptions v (_config_mapOptions config) >> return v
-        markers = maybe [] _mapsState_markers mapsState
+        makeOrUpdateMap Nothing = createMap mapEl (_config_mapOptions config)
+        makeOrUpdateMap (Just m) = let v = _mapsState_mapVal m in setMapOptions v (_config_mapOptions config) >> return v
+        markerVals = maybe empty _mapsState_markers mapsState
+        infoWindowVals = maybe empty _mapsState_infoWindows mapsState
 
-manageMarkers :: MapVal -> [MarkerOptions] -> [MarkerVal] -> JSM [MarkerVal]
+manageMarkers :: MapVal -> Map k MarkerOptions -> Map k MarkerVal -> JSM (Map k MarkerVal)
 manageMarkers mapVal markers existing = do
-    forM_ existing $ \(MarkerVal m) -> m # "setMap" $ [JSNull]
+    forM_ existing $ \(MarkerVal m) -> m # "setMap" $ (JSNull)
     forM markers $ createMarker mapVal
+
+manageInfoWindows :: Ord k => MapVal -> Map k InfoWindowState -> Map k InfoWindowVal -> JSM (Map k InfoWindowVal)
+manageInfoWindows mapVal states vals = do
+    forM_ (vals `M.difference` states) close
+    forM_ (intersectionWith (,) states vals) $ \((InfoWindowState options stateOpen), val) -> do
+        update stateOpen val
+        setInfoWindowOptions val options
+    newVals <- forM (states `M.difference` vals) makeWindows
+    return $ newVals `union` (vals `intersection` states)
+    where
+        makeWindows (InfoWindowState options stateOpen) = do
+            infoWindow <- createInfoWindow options
+            update stateOpen infoWindow
+            return infoWindow
+        update True = open mapVal
+        update False = close
 

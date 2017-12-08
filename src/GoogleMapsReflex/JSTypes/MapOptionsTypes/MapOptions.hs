@@ -47,7 +47,7 @@ data MapOptions = MapOptions {
     _mapOptions_tilt :: Int,
     _mapOptions_zoom :: Double,
     _mapOptions_zoomControl :: Bool
-} deriving (Show, Eq, Ord)
+}
 
 instance MakeObject MapOptions where
     makeObject MapOptions{..} = do
