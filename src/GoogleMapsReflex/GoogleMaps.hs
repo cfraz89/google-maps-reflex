@@ -18,6 +18,7 @@ import Reflex.Dom.Core
 import GoogleMapsReflex.JSTypes
 import GoogleMapsReflex.Types
 import GoogleMapsReflex.MapsApi
+import GoogleMapsReflex.Values
 
 import qualified JSDOM.Types as JDT
 
@@ -49,8 +50,8 @@ updateMapState mapEl mapsState config = Just $ liftJSM $ do
         mapVal (Just m) = let v = _mapsState_mapVal m in setOptions v (_config_mapOptions config) >> return v
         markers = maybe [] _mapsState_markers mapsState
 
-manageMarkers :: JSVal -> [MarkerOptions] -> [JSVal] -> JSM [JSVal]
+manageMarkers :: MapVal -> [MarkerOptions] -> [MarkerVal] -> JSM [MarkerVal]
 manageMarkers mapVal markers existing = do
-    forM_ existing $ \m -> m # "setMap" $ [JSNull]
+    forM_ existing $ \(MarkerVal m) -> m # "setMap" $ [JSNull]
     forM markers $ createMarker mapVal
 

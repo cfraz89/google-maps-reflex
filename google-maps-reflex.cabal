@@ -17,6 +17,7 @@ library
   hs-source-dirs:      src
   exposed-modules:     GoogleMapsReflex,
                        GoogleMapsReflex.MapsApi,
+                       GoogleMapsReflex.Values,
                        GoogleMapsReflex.Widget
                        GoogleMapsReflex.Types,
                        GoogleMapsReflex.MapsEvent,

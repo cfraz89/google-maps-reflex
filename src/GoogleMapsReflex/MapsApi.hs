@@ -4,6 +4,7 @@ module GoogleMapsReflex.MapsApi where
 
 import GoogleMapsReflex.JSTypes
 import GoogleMapsReflex.Common
+import GoogleMapsReflex.Values
 
 import Language.Javascript.JSaddle.Object
 import Language.Javascript.JSaddle.Types
@@ -12,21 +13,22 @@ import qualified JSDOM.Types as JDT
 import qualified Data.Text as T
 import Control.Monad.IO.Class
 
-createMap :: JDT.ToJSVal e => e -> MapOptions -> JSM JSVal
-createMap mapEl mapOptions = new (gmaps ! "Map") (mapEl, makeObject mapOptions)
+createMap :: JDT.ToJSVal e => e -> MapOptions -> JSM MapVal
+createMap mapEl mapOptions = MapVal <$> new (gmaps ! "Map") (mapEl, makeObject mapOptions)
 
-createMarker :: JSVal -> MarkerOptions -> JSM JSVal
-createMarker mapVal options = do
+createMarker :: MapVal -> MarkerOptions -> JSM MarkerVal
+createMarker (MapVal mapVal) options = do
     optionsVal <- makeObject options
     optionsVal <# "map" $ mapVal
-    new (gmaps ! "Marker") (val optionsVal)
+    MarkerVal <$> new (gmaps ! "Marker") (val optionsVal)
 
-setOptions :: JSVal -> MapOptions -> JSM JSVal
-setOptions mapVal mapOptions = mapVal # "setOptions" $ val (makeObject mapOptions) 
+setOptions :: MapVal -> MapOptions -> JSM ()
+setOptions (MapVal mapVal) mapOptions = () <$ (mapVal # "setOptions" $ val (makeObject mapOptions) )
 
-addListener :: (MonadJSM m) => T.Text -> JSVal -> (JSVal -> IO ()) -> m JSVal
-addListener eventName mapVal cb = liftJSM $ do
+addListener :: (MonadJSM m) => T.Text -> JSVal -> (JSVal -> IO ()) -> m EventListenerVal
+addListener eventName listenee cb = liftJSM $ do
     listener <- asyncFunction $ \ _ _ args -> liftIO $ cb (head args)
-    gmaps ! "event" # "addListener" $ [val mapVal, val eventName, val listener]
+    EventListenerVal <$> (gmaps ! "event" # "addListener" $ [val listenee, val eventName, val listener])
+
 close :: InfoWindowVal -> JSM ()
 close (InfoWindowVal infoWindow) = () <$ (infoWindow # "close" $ ())
