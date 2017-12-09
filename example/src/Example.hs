@@ -35,8 +35,9 @@ exampleMapsWidget = do
 config :: Config
 config = Config {
   _config_mapOptions = def,
-  _config_markers = [MarkerOptions {
+  _config_markers = [def {
     _markerOptions_position = LatLng 0 0,
-    _markerOptions_title = "Title" 
+    _markerOptions_title = "Title",
+    _markerOptions_animation = Bounce
   }]
 }
