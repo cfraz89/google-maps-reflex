@@ -20,7 +20,7 @@ library
                        GoogleMapsReflex.Values,
                        GoogleMapsReflex.Widget
                        GoogleMapsReflex.Types,
-                       GoogleMapsReflex.MapsEvent,
+                       GoogleMapsReflex.MapEvent,
                        GoogleMapsReflex.JSTypes,
                        GoogleMapsReflex.JSTypes.LatLng,
                        GoogleMapsReflex.JSTypes.Point,

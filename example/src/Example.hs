@@ -3,9 +3,9 @@ module Example where
 
 import Data.Functor
 import Reflex.Dom.Core
-import GoogleMapsReflex
+import qualified GoogleMapsReflex as G
+import Data.Map
 import GHCJS.DOM.Types (JSM)
-import qualified GoogleMapsReflex.MapsEvent as E
 
 exampleMapsApp :: JSM ()
 exampleMapsApp = mainWidget exampleMapsWidget
@@ -24,7 +24,7 @@ exampleMapsWidget = do
   maps <- googleMaps mapEl (ApiKey "Put key here - https://developers.google.com/maps/documentation/javascript/get-api-key") configDyn
 
   --Get the click event on the map
-  mc <- E.mapsEvent E.Click maps _mapsState_mapVal
+  mc <- G.mapEvent G.Click maps 
 
   d <- holdDyn "" (const "Clicked" <$> mc)
   el "div" $ dynText d
@@ -32,12 +32,11 @@ exampleMapsWidget = do
   return ()
 
 
-config :: Config
-config = Config {
-  _config_mapOptions = def,
-  _config_markers = [def {
-    _markerOptions_position = LatLng 0 0,
-    _markerOptions_title = "Title",
-    _markerOptions_animation = Bounce
-  }]
+config :: G.Config Int
+config = def {
+  G._config_markers = fromList [(0, def {
+    G._markerOptions_position = G.LatLng 0 0,
+    G._markerOptions_title = "Title",
+    G._markerOptions_animation = Just G.Drop
+  })]
 }
