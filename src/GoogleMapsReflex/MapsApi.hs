@@ -1,5 +1,7 @@
 {-# LANGUAGE FlexibleContexts #-}
 {-# LANGUAGE NoMonomorphismRestriction #-}
+{-# LANGUAGE TypeFamilies #-}
+
 module GoogleMapsReflex.MapsApi where
 
 import GoogleMapsReflex.JSTypes
@@ -22,8 +24,13 @@ createMarker (MapVal mapVal) options = do
     optionsVal <# "map" $ mapVal
     MarkerVal <$> new (gmaps ! "Marker") (val optionsVal)
 
-setMapOptions :: MapVal -> MapOptions -> JSM ()
-setMapOptions (MapVal mapVal) options = () <$ (mapVal # "setOptions" $ val (makeObject options) )
+class (ValueWrapped v, MakeObject (Options v)) => SetOptions v where
+    type Options v :: *
+    setOptions :: v -> Options v -> JSM ()
+    setOptions v options = () <$ (unVal v # "setOptions" $ val (makeObject options) )
+
+instance SetOptions MapVal where type Options MapVal = MapOptions
+instance SetOptions InfoWindowVal where type Options InfoWindowVal = InfoWindowOptions
 
 addListener :: (MonadJSM m) => T.Text -> JSVal -> (JSVal -> IO ()) -> m EventListenerVal
 addListener eventName listenee cb = liftJSM $ do
@@ -37,9 +44,6 @@ createInfoWindow options = do
 
 open ::  MapVal -> InfoWindowVal -> JSM ()
 open (MapVal map) (InfoWindowVal infoWindow) = () <$ (infoWindow # "open" $ (map))
-
-setInfoWindowOptions :: InfoWindowVal -> InfoWindowOptions -> JSM ()
-setInfoWindowOptions (InfoWindowVal mapVal) options = () <$ (mapVal # "setOptions" $ val (makeObject options) )
 
 close :: InfoWindowVal -> JSM ()
 close (InfoWindowVal infoWindow) = () <$ (infoWindow # "close" $ ())

@@ -50,7 +50,7 @@ updateMapState mapEl mapsState config = Just $ liftJSM $ do
     return $ MapsState mapEl mapVal' markers' infoWindows'
     where
         makeOrUpdateMap Nothing = createMap mapEl (_config_mapOptions config)
-        makeOrUpdateMap (Just m) = let v = _mapsState_mapVal m in setMapOptions v (_config_mapOptions config) >> return v
+        makeOrUpdateMap (Just m) = let v = _mapsState_mapVal m in setOptions v (_config_mapOptions config) >> return v
         markerVals = maybe empty _mapsState_markers mapsState
         infoWindowVals = maybe empty _mapsState_infoWindows mapsState
 
@@ -64,7 +64,7 @@ manageInfoWindows mapVal states vals = do
     forM_ (vals `M.difference` states) close
     forM_ (intersectionWith (,) states vals) $ \((InfoWindowState options stateOpen), val) -> do
         update stateOpen val
-        setInfoWindowOptions val options
+        setOptions val options
     newVals <- forM (states `M.difference` vals) makeWindows
     return $ newVals `union` (vals `intersection` states)
     where
